@@ -207,6 +207,9 @@ impl ZPE {
 mod tests {
     use super::*;
 
+    use std::fs;
+    use std::path::Path;
+
     macro_rules! test_roundtrip {
         ($name:ident, $encoder:ident, $src:expr, $dst:expr) => {
             #[test]
@@ -263,5 +266,23 @@ mod tests {
         assert!(!got.contains(&0));
         let orig = Encoder::decode(&got).unwrap();
         assert_eq!(orig, src);
+    }
+
+    #[test]
+    fn test_fuzzer_corpus() {
+        let path = Path::new("fuzz/corpus/fuzz_roundtrip");
+        let dir = fs::read_dir(path).unwrap();
+        for entry in dir {
+            let entry = entry.unwrap();
+            let data = fs::read(entry.path()).unwrap();
+
+            let zgot = ZPE::encode(&data);
+            let zorig = ZPE::decode(&zgot).unwrap();
+            assert_eq!(zorig, data);
+
+            let got = Encoder::encode(&data);
+            let orig = Encoder::decode(&got).unwrap();
+            assert_eq!(orig, data);
+        }
     }
 }
