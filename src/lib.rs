@@ -1,7 +1,7 @@
 pub struct Encoder {}
 
 #[derive(Debug, Clone, Copy)]
-pub struct CorruptError {}
+pub struct CorruptError;
 
 impl Encoder {
     pub fn encode(src: &[u8]) -> Vec<u8> {
@@ -52,7 +52,7 @@ impl Encoder {
         while ptr < src.len() {
             let code = src[ptr];
             if ptr + (code as usize) > src.len() {
-                return Err(CorruptError {});
+                return Err(CorruptError);
             }
 
             ptr += 1;
@@ -172,7 +172,7 @@ impl ZPE {
             };
 
             if ptr + l > src.len() {
-                return Err(CorruptError {});
+                return Err(CorruptError);
             }
 
             ptr += 1;
